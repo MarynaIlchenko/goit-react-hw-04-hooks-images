@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { Searchbar } from './Searchbar';
 import { ApiService } from './services/api';
 import { ImageGallery } from './ImageGallery';
@@ -8,118 +8,115 @@ import { Loader } from './Loader';
 
 const apiService = new ApiService();
 
-export class App extends Component {
-  state = {
-    imageArr: [],
-    query: '',
-    error: null,
-    isLoading: false,
-    showModal: false,
-    largeImageURL: '',
-    page: 1,
-  };
+export const App = () => {
+  const [imageArr, setImageArr] = useState([]);
+  const [query, setQuery] = useState('');
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [largeImageURL, setLargeImageURL] = useState('');
+  const [page, setPage] = useState(1);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { query, page } = this.state;
-    apiService.query = query;
-
-    if (prevState.query !== query) {
-      this.onFetchImage();
-    } else if (prevState.page !== page) {
-      this.onLoadImage();
+  useEffect(() => {
+    if (!query) {
+      return;
     }
-  }
+    if (error) {
+      alert('Something went wrong :(');
+      return;
+    }
+    apiService.query = query;
+    setImageArr([]);
+    onFetchImage();
+  }, [query, error]);
 
-  onSearch = newQuery => {
+  useEffect(() => {
+    if (page === 1) {
+      return;
+    }
+    if (error) {
+      alert('Something went wrong :(');
+      return;
+    }
+    onLoadImage();
+  }, [page, error]);
+
+  const onSearch = newQuery => {
     apiService.resetPage();
-    this.setState({
-      query: newQuery,
-    });
+    setQuery(newQuery);
   };
 
-  onToggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
+  const onToggleModal = () => {
+    setShowModal(!showModal);
   };
 
-  onClickImg = event => {
-    this.setState({
-      largeImageURL: this.state.imageArr.find(
-        img => img.webformatURL === event.target.src
-      ).largeImageURL,
-    });
+  const onClickImg = event => {
+    setLargeImageURL(
+      imageArr.find(img => img.webformatURL === event.target.src).largeImageURL
+    );
   };
 
-  onFetchImage = async () => {
-    this.setState({ isLoading: true });
+  const onFetchImage = async () => {
+    setIsLoading(true);
 
     try {
       const imageArr = await apiService.fetchImage();
-      this.setState({
-        imageArr: imageArr.map(({ id, webformatURL, largeImageURL }) => ({
+      setImageArr(
+        imageArr.map(({ id, webformatURL, largeImageURL }) => ({
           id,
           webformatURL,
           largeImageURL,
-        })),
-      });
+        }))
+      );
     } catch (error) {
-      this.setState({ error });
+      setError(error);
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
   };
 
-  onLoadImage = async () => {
-    this.setState({ isLoading: true });
+  const onLoadImage = async () => {
+    setIsLoading(true);
 
     try {
       const imageArr = await apiService.fetchImage();
-      this.setState(prevState => ({
-        imageArr: [
-          ...prevState.imageArr,
-          ...imageArr.map(({ id, webformatURL, largeImageURL }) => ({
-            id,
-            webformatURL,
-            largeImageURL,
-          })),
-        ],
-      }));
+      setImageArr(
+        imageArr.map(({ id, webformatURL, largeImageURL }) => ({
+          id,
+          webformatURL,
+          largeImageURL,
+        }))
+      );
     } catch (error) {
-      this.setState({ error });
+      setError(error);
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
   };
 
-  onLoadMore = () => {
-    const nextPage = this.state.page + 1;
-    return this.setState({ page: nextPage });
+  const onLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
   };
 
-  render() {
-    const { isLoading, imageArr, showModal, largeImageURL } = this.state;
-    return (
-      <>
-        <Searchbar onSubmit={this.onSearch} />
+  return (
+    <>
+      <Searchbar onSubmit={onSearch} />
+      {isLoading && imageArr.length < 12 && <Loader />}
+      {imageArr.length >= 12 && (
+        <ImageGallery
+          onClickImg={onClickImg}
+          images={imageArr}
+          onToggleModal={onToggleModal}
+        />
+      )}
+      {showModal && <Modal onToggleModal={onToggleModal} img={largeImageURL} />}
 
-        {imageArr.length >= 12 && (
-          <ImageGallery
-            onClickImg={this.onClickImg}
-            images={imageArr}
-            onToggleModal={this.onToggleModal}
-          />
-        )}
-        {showModal && (
-          <Modal onToggleModal={this.onToggleModal} img={largeImageURL} />
-        )}
+      {isLoading && imageArr.length > 0 && <Loader />}
 
-        {isLoading && <Loader />}
-
-        {imageArr.length >= 12 && !isLoading && (
-          <Button onLoadMore={this.onLoadMore} />
-        )}
-      </>
-    );
-  }
-}
+      {imageArr.length >= 12 && !isLoading && (
+        <Button onLoadMore={onLoadMore} />
+      )}
+    </>
+  );
+};
