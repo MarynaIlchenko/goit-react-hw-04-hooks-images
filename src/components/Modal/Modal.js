@@ -5,7 +5,7 @@ import style from './Modal.module.css';
 
 const modalRoot = document.querySelector('#modal-root');
 
-export default function Modal({ img, onToggleModal }) {
+export const Modal = ({ img, onToggleModal }) => {
   useEffect(() => {
     const onCloseModal = event => {
       if (event.code === 'Escape') {
@@ -32,7 +32,7 @@ export default function Modal({ img, onToggleModal }) {
     </div>,
     modalRoot
   );
-}
+};
 
 Modal.propTypes = {
   onToggleModal: PropTypes.func.isRequired,

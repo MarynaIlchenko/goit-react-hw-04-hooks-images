@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 // import { render } from '@testing-library/react';
 
-export default function Searchbar({ onSubmit }) {
+export const Searchbar= ({ onSubmit }) => {
   const [value, setValue] = useState('');
 
   // static = {
