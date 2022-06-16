@@ -28,9 +28,7 @@ export const App = () => {
     apiService.query = query;
     setImageArr([]);
     onFetchImage();
-  }, [query, error]);
 
-  useEffect(() => {
     if (page === 1) {
       return;
     }
@@ -39,7 +37,10 @@ export const App = () => {
       return;
     }
     onLoadImage();
-  }, [page, error]);
+  }, [query, page, error]);
+
+  // useEffect(() => {
+  //  [page, error]
 
   const onSearch = newQuery => {
     apiService.resetPage();
