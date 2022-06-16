@@ -28,7 +28,7 @@ export const App = () => {
     apiService.query = query;
     setImageArr([]);
     onFetchImage();
-
+    // },
     if (page === 1) {
       return;
     }
@@ -81,13 +81,14 @@ export const App = () => {
 
     try {
       const imageArr = await apiService.fetchImage();
-      setImageArr(
-        imageArr.map(({ id, webformatURL, largeImageURL }) => ({
+      setImageArr(prevState => [
+        ...prevState,
+        ...imageArr.map(({ id, webformatURL, largeImageURL }) => ({
           id,
           webformatURL,
           largeImageURL,
-        }))
-      );
+        })),
+      ]);
     } catch (error) {
       setError(error);
     } finally {
