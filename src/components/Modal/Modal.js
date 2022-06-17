@@ -13,9 +13,7 @@ export const Modal = ({ img, onToggleModal }) => {
       }
     };
     window.addEventListener('keydown', onCloseModal);
-    return () => {
-      window.removeEventListener('keydown', onCloseModal);
-    };
+    return () => window.removeEventListener('keydown', onCloseModal);
   }, [onToggleModal]);
 
   const onBackdropCloseModal = event => {
