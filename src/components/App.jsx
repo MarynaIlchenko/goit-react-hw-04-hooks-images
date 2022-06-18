@@ -41,8 +41,23 @@ export const App = () => {
     onLoadImage();
   }, [page, error]);
 
+  // Поєднання useEffect
+
   // useEffect(() => {
-  //  [page, error]
+  //   if (!query) {
+  //     return;
+  //   }
+  //   if (error) {
+  //     alert('Something went wrong :(');
+  //     return;
+  //   }
+  //   apiService.query = query;
+  //   setImageArr([]);
+  //   onFetchImage();
+  //   if (page === 1) {
+  //     return;
+  //   }
+  // }, [query, page, error]);
 
   const onSearch = newQuery => {
     apiService.resetPage();
