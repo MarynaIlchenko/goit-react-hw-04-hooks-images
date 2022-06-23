@@ -26,20 +26,11 @@ export const App = () => {
       return;
     }
     apiService.query = query;
-    setImageArr([]);
-    onFetchImage();
-  }, [query, error]);
-
-  useEffect(() => {
+    onLoadImage();
     if (page === 1) {
       return;
     }
-    if (error) {
-      alert('Something went wrong :(');
-      return;
-    }
-    onLoadImage();
-  }, [page, error]);
+  }, [query, page, error]);
 
   // Поєднання useEffect
 
@@ -61,6 +52,7 @@ export const App = () => {
 
   const onSearch = newQuery => {
     apiService.resetPage();
+    setImageArr([]);
     setQuery(newQuery);
   };
 
